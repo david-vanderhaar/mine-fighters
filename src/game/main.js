@@ -1,4 +1,5 @@
 import { Boot } from './scenes/Boot';
+import { CharacterPreview } from './scenes/CharacterPreview';
 import { Game as MainGame } from './scenes/Game';
 import { GameOver } from './scenes/GameOver';
 import { MainMenu } from './scenes/MainMenu';
@@ -13,6 +14,7 @@ const config = {
     height: 768,
     parent: 'game-container',
     backgroundColor: '#028af8',
+    pixelArt: true,
     scale: {
         mode: Phaser.Scale.FIT,
         autoCenter: Phaser.Scale.CENTER_BOTH
@@ -21,6 +23,7 @@ const config = {
         Boot,
         Preloader,
         MainMenu,
+        CharacterPreview,
         MainGame,
         GameOver
     ]
