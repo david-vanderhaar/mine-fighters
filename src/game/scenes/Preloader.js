@@ -38,6 +38,11 @@ export class Preloader extends Scene {
       'characters/zombie.png', 
       { frameWidth: 48, frameHeight: 48 }
     );
+    this.load.spritesheet(
+      'piglin',
+      'characters/piglin.png', 
+      { frameWidth: 48, frameHeight: 48 }
+    );
   }
 
   create() {

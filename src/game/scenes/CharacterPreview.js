@@ -16,9 +16,17 @@ export class CharacterPreview extends Scene {
       name: 'Zombie',
       spritesheetName: 'zombie'
     });
+    
+    const piglin = BaseCharacter(this, {
+      name: 'piglin',
+      spritesheetName: 'piglin'
+    });
 
-    steve.initializeAnimations();
-    steve.startAnimationPreview({x: 800, y: 370});
+    // steve.initializeAnimations();
+    // steve.startAnimationPreview({x: 800, y: 370});
+
+    piglin.initializeAnimations();
+    piglin.startAnimationPreview({x: 800, y: 370});
 
     zombie.initializeAnimations();
     zombie.startAnimationPreview({x: 400, y: 370, flipRight: true});
