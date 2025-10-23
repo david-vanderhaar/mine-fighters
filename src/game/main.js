@@ -19,6 +19,15 @@ const config = {
         mode: Phaser.Scale.FIT,
         autoCenter: Phaser.Scale.CENTER_BOTH
     },
+    physics: {
+        default: 'arcade',
+        arcade: {
+            debug: true
+        }
+    },
+    input: {
+        gamepad: true
+    },
     scene: [
         Boot,
         Preloader,

@@ -3,27 +3,43 @@ export function BaseCharacter(scene, {
   health = 10,
   speed = 10,
   attack = 1,
-  spritesheetName = 'default'
+  spritesheetName = 'default',
+  x = 600,
+  y = 370,
+  flipRight = false
 }) {
+  const sprite = initializeSprite(scene, x, y, flipRight);
   return {
     name,
     health,
     speed,
     attack,
+    sprite,
     initializeAnimations: () => initializeAnimations(scene, spritesheetName),
-    startAnimationPreview: ({x, y, flipRight}) => startAnimationPreview(scene, spritesheetName, flipRight, x, y)
+    startAnimationPreview: () => startAnimationPreview(scene, sprite, spritesheetName, x, y),
+    initializePhysics: () => {
+      scene.physics.add.existing(sprite);
+      sprite.body.setCollideWorldBounds(true);
+      sprite.body.setGravity(0, 450);
+      sprite.body.setMaxVelocity(600, 600)
+    },
   }
 }
 
-function startAnimationPreview(scene, spritesheetName, flipRight= false, x = 600, y = 370) {
-  const keys = ['walk', 'idle', 'kick', 'punch', 'jump', 'jumpkick', 'win', 'die'];
-  const character = scene.add.sprite(x, y);
-  character.setScale(8);
-  // flip the character to face left
-  if (flipRight) character.setFlipX(true);
-  character.play(spritesheetName + '-walk');
+function initializeSprite(scene, x, y, flipRight) {
+  const sprite = scene.add.sprite(x, y);
+  sprite.setScale(8);
+  sprite.setFlipX(flipRight);
 
-  const current = scene.add.text(x, y + 200, 'Playing: walk', { color: '#00ff00' });
+  return sprite;
+}
+
+function startAnimationPreview(scene, sprite, spritesheetName, x , y ) {
+  const keys = ['walk', 'idle', 'kick', 'punch', 'jump', 'jumpkick', 'win', 'die'];
+
+  sprite.play(spritesheetName + '-idle');
+
+  const current = scene.add.text(x, y + 200, 'Playing: idle', { color: '#00ff00' });
 
   // randomly change animation on pointer down
   // let c = 0;
@@ -34,7 +50,7 @@ function startAnimationPreview(scene, spritesheetName, flipRight= false, x = 600
       c = 0;
     }
     const key = `${spritesheetName}-${keys[c]}`;
-    character.play(key);
+    sprite.play(key);
     current.setText('Playing: ' + key);
   });
 }
