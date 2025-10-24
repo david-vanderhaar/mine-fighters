@@ -20,7 +20,7 @@ export function BaseCharacter(scene, {
     initializePhysics: () => {
       scene.physics.add.existing(sprite);
       sprite.body.setCollideWorldBounds(true);
-      sprite.body.setGravity(0, 450);
+      sprite.body.setGravity(0, 1000);
       sprite.body.setMaxVelocity(600, 600)
     },
   }

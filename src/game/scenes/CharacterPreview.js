@@ -5,7 +5,7 @@ export class CharacterPreview extends Scene {
   constructor() {
     super('CharacterPreview');
 
-    this.sprites = [];
+    this.characters = [];
   }
 
   create() {
@@ -35,17 +35,17 @@ export class CharacterPreview extends Scene {
     steve.initializeAnimations();
     steve.startAnimationPreview();
     steve.initializePhysics();
-    this.sprites.push(steve.sprite);
+    this.characters.push(steve);
 
     piglin.initializeAnimations();
     piglin.startAnimationPreview();
     piglin.initializePhysics();
-    this.sprites.push(piglin.sprite);
+    this.characters.push(piglin);
 
     // zombie.initializeAnimations();
     // zombie.startAnimationPreview();
     // zombie.initializePhysics();
-    // this.sprites.push(zombie.sprite);
+    // this.characters.push(zombie);
 
     console.log(this.input);
     
@@ -55,40 +55,40 @@ export class CharacterPreview extends Scene {
   }
 
   update() {
-    processInputs(this);
+    processInputs(this, this.characters);
   }
 }
 
-function processInputs(scene) {
+function processInputs(scene, characters) {
   const pads = scene.input.gamepad.gamepads;
 
-  for (let i = 0; i < pads.length; i++) {
-    const gamepad = pads[i];
+  characters.forEach((character, index) => {
+    processCharacterGamepadInputs(scene, character, pads[index]);
+  });
+}
 
-    if (!gamepad) {
-      continue;
-    }
+function processCharacterGamepadInputs(scene, character, gamepad) {
+  if (!gamepad) {
+    return;
+  }
 
-    const sprite = scene.sprites[i];
+  const sprite = character.sprite;
 
-    if (gamepad.left) {
-      sprite.x -= 4;
-      sprite.flipX = false;
-    }
-    else if (gamepad.right) {
-      sprite.x += 4;
-      sprite.flipX = true;
-    }
+  if (gamepad.left) {
+    sprite.x -= 4;
+    sprite.flipX = false;
+  }
+  else if (gamepad.right) {
+    sprite.x += 4;
+    sprite.flipX = true;
+  }
 
-    if (gamepad.up) {
-      if (sprite.body.onFloor()) {
-        // sprite.y -= 4;
-        sprite.body.setVelocityY(-300);
-      }
+  if (gamepad.up) {
+    if (sprite.body.onFloor()) {
+      sprite.body.setVelocityY(-300);
     }
-    else if (gamepad.down) {
-      // sprite.y += 4;
-      
-    }
+  }
+  else if (gamepad.down) {
+    // sprite.y += 4;
   }
 }
