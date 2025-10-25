@@ -16,36 +16,49 @@ export class CharacterPreview extends Scene {
       y: 370,
     });
 
-    const zombie = BaseCharacter(this, {
-      name: 'Zombie',
-      spritesheetName: 'zombie',
-      x: 400,
-      y: 370,
-      flipRight: true
-    });
-    
-    const piglin = BaseCharacter(this, {
-      name: 'piglin',
-      spritesheetName: 'piglin',
-      x: 400,
-      y: 370,
-      flipRight: true
-    });
-
     steve.initializeAnimations();
     steve.startAnimationPreview();
     steve.initializePhysics();
     this.characters.push(steve);
 
-    piglin.initializeAnimations();
-    piglin.startAnimationPreview();
-    piglin.initializePhysics();
-    this.characters.push(piglin);
+    // const zombie = BaseCharacter(this, {
+    //   name: 'Zombie',
+    //   spritesheetName: 'zombie',
+    //   x: 400,
+    //   y: 370,
+    //   flipRight: true
+    // });
 
     // zombie.initializeAnimations();
     // zombie.startAnimationPreview();
     // zombie.initializePhysics();
     // this.characters.push(zombie);
+    
+    // const piglin = BaseCharacter(this, {
+    //   name: 'piglin',
+    //   spritesheetName: 'piglin',
+    //   x: 400,
+    //   y: 370,
+    //   flipRight: true
+    // });
+
+    // piglin.initializeAnimations();
+    // piglin.startAnimationPreview();
+    // piglin.initializePhysics();
+    // this.characters.push(piglin);
+    
+    const drowned = BaseCharacter(this, {
+      name: 'drowned',
+      spritesheetName: 'drowned',
+      x: 400,
+      y: 370,
+      flipRight: true
+    });
+
+    drowned.initializeAnimations();
+    drowned.startAnimationPreview();
+    drowned.initializePhysics();
+    this.characters.push(drowned);
 
     console.log(this.input);
     

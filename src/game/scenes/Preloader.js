@@ -43,6 +43,11 @@ export class Preloader extends Scene {
       'characters/piglin.png', 
       { frameWidth: 48, frameHeight: 48 }
     );
+    this.load.spritesheet(
+      'drowned',
+      'characters/drowned.png', 
+      { frameWidth: 48, frameHeight: 48 }
+    );
   }
 
   create() {
