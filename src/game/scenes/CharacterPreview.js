@@ -90,18 +90,36 @@ function processCharacterGamepadInputs(scene, character, gamepad) {
   if (gamepad.left) {
     sprite.x -= 4;
     sprite.flipX = false;
-  }
-  else if (gamepad.right) {
+    character.play('walk');
+  } else if (gamepad.right) {
     sprite.x += 4;
     sprite.flipX = true;
-  }
-
-  if (gamepad.up) {
+    character.play('walk');
+  } else if (gamepad.up) {
     if (sprite.body.onFloor()) {
-      sprite.body.setVelocityY(-300);
+      sprite.body.setVelocityY(-600);
+      character.play('jump');
     }
-  }
-  else if (gamepad.down) {
+  } else if (gamepad.down) {
     // sprite.y += 4;
+  } else if (gamepad.A) {
+    character.play('punch');
+  } else if (gamepad.B) {
+    character.play('kick');
+  } else if (gamepad.X) {
+    if (sprite.body.onFloor()) {
+      character.play('win');
+    }
+  } else if (gamepad.Y) {
+    character.play('die');
+  } 
+  else {
+    if (sprite.body.onFloor()) {
+      // character.play('idle');
+      // if characis walking, reset to idle
+      // if (sprite.anims.currentAnim.key === character.spritesheetName + '-walk') {
+      //   character.play('idle');
+      // }
+    }
   }
 }

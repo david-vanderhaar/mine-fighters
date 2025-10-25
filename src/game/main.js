@@ -13,7 +13,7 @@ const config = {
     width: 1024,
     height: 768,
     parent: 'game-container',
-    backgroundColor: '#028af8',
+    backgroundColor: '#141516',
     pixelArt: true,
     scale: {
         mode: Phaser.Scale.FIT,
@@ -22,7 +22,7 @@ const config = {
     physics: {
         default: 'arcade',
         arcade: {
-            debug: true
+            // debug: true
         }
     },
     input: {
@@ -39,9 +39,7 @@ const config = {
 };
 
 const StartGame = (parent) => {
-
     return new Game({ ...config, parent });
-
 }
 
 export default StartGame;

@@ -23,6 +23,7 @@ export function BaseCharacter(scene, {
       sprite.body.setGravity(0, 1000);
       sprite.body.setMaxVelocity(600, 600)
     },
+    play: (action) => play(sprite, spritesheetName, action),
   }
 }
 
@@ -39,7 +40,7 @@ function startAnimationPreview(scene, sprite, spritesheetName, x , y ) {
 
   sprite.play(spritesheetName + '-idle');
 
-  const current = scene.add.text(x, y + 200, 'Playing: idle', { color: '#00ff00' });
+  // const current = scene.add.text(x, y + 200, 'Playing: idle', { color: '#00ff00' });
 
   // randomly change animation on pointer down
   // let c = 0;
@@ -51,8 +52,21 @@ function startAnimationPreview(scene, sprite, spritesheetName, x , y ) {
     }
     const key = `${spritesheetName}-${keys[c]}`;
     sprite.play(key);
-    current.setText('Playing: ' + key);
+    // current.setText('Playing: ' + key);
   });
+}
+
+function play(sprite, spritesheetName, action) {
+  const key = `${spritesheetName}-${action}`;
+  if (sprite.anims.currentAnim.key !== key || !sprite.anims.isPlaying) {
+    sprite.play(key);
+    // then reset to idle after certain animations
+    if (['punch', 'kick', 'jumpkick', 'walk'].includes(action)) {
+      sprite.on('animationcomplete', () => {
+        sprite.play(spritesheetName + '-idle');
+      }, { once: true });
+    } 
+  }
 }
 
 function initializeAnimations(scene, spritesheetName) {
@@ -61,14 +75,13 @@ function initializeAnimations(scene, spritesheetName) {
     key: spritesheetName + '-punch',
     frames: scene.anims.generateFrameNumbers(spritesheetName, { frames: [0, 1, 2, 3] }),
     frameRate: 8,
-    repeat: -1
   });
 
   scene.anims.create({
     key: spritesheetName + '-walk',
     frames: scene.anims.generateFrameNumbers(spritesheetName, { frames: [4, 5, 6, 7] }),
     frameRate: 8,
-    repeat: -1
+    // repeat: -1
   });
 
   scene.anims.create({
@@ -82,22 +95,18 @@ function initializeAnimations(scene, spritesheetName) {
     key: spritesheetName + '-kick',
     frames: scene.anims.generateFrameNumbers(spritesheetName, { frames: [12, 13, 14, 15, 12] }),
     frameRate: 8,
-    repeat: -1,
-    repeatDelay: 500
   });
 
   scene.anims.create({
     key: spritesheetName + '-jump',
     frames: scene.anims.generateFrameNumbers(spritesheetName, { frames: [16, 17, 18, 19] }),
     frameRate: 8,
-    repeat: -1
   });
 
   scene.anims.create({
     key: spritesheetName + '-jumpkick',
     frames: scene.anims.generateFrameNumbers(spritesheetName, { frames: [16, 17, 18, 19, 20, 19, 18] }),
     frameRate: 8,
-    repeat: -1
   });
 
   scene.anims.create({
