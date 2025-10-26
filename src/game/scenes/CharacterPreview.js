@@ -1,7 +1,7 @@
-import { Scene } from 'phaser';
+import { BaseScene } from './BaseScene.js';
 import { BaseCharacter } from '../characters/BaseCharacter.js';
 
-export class CharacterPreview extends Scene {
+export class CharacterPreview extends BaseScene {
   constructor() {
     super('CharacterPreview');
 
@@ -9,59 +9,54 @@ export class CharacterPreview extends Scene {
   }
 
   create() {
+    super.create();
+
     const steve = BaseCharacter(this, {
       name: 'Steve',
       spritesheetName: 'steve',
       x: 800,
-      y: 370,
+      y: 470,
     });
 
     steve.initializeAnimations();
     steve.startAnimationPreview();
-    steve.initializePhysics();
     this.characters.push(steve);
 
-    // const zombie = BaseCharacter(this, {
-    //   name: 'Zombie',
-    //   spritesheetName: 'zombie',
-    //   x: 400,
-    //   y: 370,
-    //   flipRight: true
-    // });
+    const zombie = BaseCharacter(this, {
+      name: 'Zombie',
+      spritesheetName: 'zombie',
+      x: 400,
+      y: 170,
+      flipRight: true
+    });
 
-    // zombie.initializeAnimations();
-    // zombie.startAnimationPreview();
-    // zombie.initializePhysics();
-    // this.characters.push(zombie);
+    zombie.initializeAnimations();
+    zombie.startAnimationPreview();
+    this.characters.push(zombie);
     
-    // const piglin = BaseCharacter(this, {
-    //   name: 'piglin',
-    //   spritesheetName: 'piglin',
-    //   x: 400,
-    //   y: 370,
-    //   flipRight: true
-    // });
+    const piglin = BaseCharacter(this, {
+      name: 'piglin',
+      spritesheetName: 'piglin',
+      x: 800,
+      y: 170,
+    });
 
-    // piglin.initializeAnimations();
-    // piglin.startAnimationPreview();
-    // piglin.initializePhysics();
-    // this.characters.push(piglin);
+    piglin.initializeAnimations();
+    piglin.startAnimationPreview();
+    this.characters.push(piglin);
     
     const drowned = BaseCharacter(this, {
       name: 'drowned',
       spritesheetName: 'drowned',
       x: 400,
-      y: 370,
+      y: 470,
       flipRight: true
     });
 
     drowned.initializeAnimations();
     drowned.startAnimationPreview();
-    drowned.initializePhysics();
     this.characters.push(drowned);
 
-    console.log(this.input);
-    
     this.input.gamepad.once('connected', function (pad) {
       console.log('Gamepad connected:', pad.id);
     }, this);

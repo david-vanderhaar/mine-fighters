@@ -1,10 +1,10 @@
 import { BaseScene } from './BaseScene.js';
 
-export class Game extends BaseScene
+export class CharacterSelect extends BaseScene
 {
     constructor ()
     {
-        super('Game');
+        super('CharacterSelect');
     }
 
     create ()
@@ -14,16 +14,15 @@ export class Game extends BaseScene
 
         this.add.image(512, 384, 'background').setAlpha(0.5);
 
-        this.add.text(512, 384, 'Make something fun!\nand share it with us:\nsupport@phaser.io', {
+        this.add.text(512, 384, 'Character Select', {
             fontFamily: 'Arial Black', fontSize: 38, color: '#ffffff',
             stroke: '#000000', strokeThickness: 8,
             align: 'center'
         }).setOrigin(0.5);
 
-        this.input.once('pointerdown', () => {
-
-            this.scene.start('GameOver');
-
+        // on enter key press, start main game
+        this.input.keyboard.once('keydown-ENTER', () => {
+            this.scene.start('MainGame');
         });
     }
 }

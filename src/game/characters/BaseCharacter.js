@@ -40,7 +40,7 @@ function startAnimationPreview(scene, sprite, spritesheetName, x , y ) {
 
   sprite.play(spritesheetName + '-idle');
 
-  // const current = scene.add.text(x, y + 200, 'Playing: idle', { color: '#00ff00' });
+  const current = scene.add.text(x, y + 200, 'Playing: idle', { color: '#00ff00' });
 
   // randomly change animation on pointer down
   // let c = 0;
@@ -52,7 +52,7 @@ function startAnimationPreview(scene, sprite, spritesheetName, x , y ) {
     }
     const key = `${spritesheetName}-${keys[c]}`;
     sprite.play(key);
-    // current.setText('Playing: ' + key);
+    current.setText('Playing: ' + key);
   });
 }
 

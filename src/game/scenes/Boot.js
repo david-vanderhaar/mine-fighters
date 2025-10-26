@@ -1,6 +1,6 @@
-import { Scene } from 'phaser';
+import { BaseScene } from './BaseScene.js';
 
-export class Boot extends Scene
+export class Boot extends BaseScene
 {
     constructor ()
     {

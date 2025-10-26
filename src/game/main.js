@@ -4,6 +4,8 @@ import { Game as MainGame } from './scenes/Game';
 import { GameOver } from './scenes/GameOver';
 import { MainMenu } from './scenes/MainMenu';
 import { Preloader } from './scenes/Preloader';
+import { CharacterSelect } from './scenes/CharacterSelect';
+import { Battle } from './scenes/Battle';   
 import { AUTO, Game } from 'phaser';
 
 //  Find out more information about the Game Config at:
@@ -33,9 +35,11 @@ const config = {
         Preloader,
         MainMenu,
         CharacterPreview,
+        CharacterSelect,
+        Battle,
         MainGame,
         GameOver
-    ]
+    ],
 };
 
 const StartGame = (parent) => {
