@@ -43,7 +43,6 @@ function startAnimationPreview(scene, sprite, spritesheetName, x , y ) {
   const current = scene.add.text(x, y + 200, 'Playing: idle', { color: '#00ff00' });
 
   // randomly change animation on pointer down
-  // let c = 0;
   let c = Math.floor(Math.random() * keys.length);
   scene.input.on('pointerdown', function () {
     c++;
@@ -58,15 +57,7 @@ function startAnimationPreview(scene, sprite, spritesheetName, x , y ) {
 
 function play(sprite, spritesheetName, action) {
   const key = `${spritesheetName}-${action}`;
-  if (sprite.anims.currentAnim.key !== key || !sprite.anims.isPlaying) {
-    sprite.play(key);
-    // then reset to idle after certain animations
-    if (['punch', 'kick', 'jumpkick', 'walk'].includes(action)) {
-      sprite.on('animationcomplete', () => {
-        sprite.play(spritesheetName + '-idle');
-      }, { once: true });
-    } 
-  }
+  sprite.play(key);
 }
 
 function initializeAnimations(scene, spritesheetName) {

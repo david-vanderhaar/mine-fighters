@@ -20,6 +20,7 @@ export class CharacterPreview extends BaseScene {
 
     steve.initializeAnimations();
     steve.startAnimationPreview();
+    steve.initializePhysics();
     this.characters.push(steve);
 
     const zombie = BaseCharacter(this, {

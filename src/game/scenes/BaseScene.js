@@ -1,27 +1,28 @@
 import { Scene } from 'phaser';
 
 export class BaseScene extends Scene {
-    constructor(key) {
-      super(key);
-    }
+  constructor(key) {
+    super(key);
+  }
 
-    create() {
-      console.log('base scene');
-      
-      // on enter key press, start next scene
-      this.input.keyboard.once('keydown-ENTER', (ev) => {
-        console.log('transition');
-        console.log(this.scene.key);
-        
-        const currentSceneKey = this.scene.key;
-        const currentIndex = SCENE_ORDER.indexOf(currentSceneKey);
-        const nextIndex = (currentIndex + 1) % SCENE_ORDER.length;
-        const nextSceneKey = SCENE_ORDER[nextIndex];
+  create() {
+    // on enter key press, start next scene
+    this.goToNextSceneOnEnter();      
+  }
 
-        this.scene.start(nextSceneKey);
-      });      
-    }
+  goToNextSceneOnEnter() {
+    this.input.keyboard.once('keydown-ENTER', () => {
+      const currentSceneKey = this.scene.key;
+      const currentIndex = SCENE_ORDER.indexOf(currentSceneKey);
+      const nextIndex = (currentIndex + 1) % SCENE_ORDER.length;
+      const nextSceneKey = SCENE_ORDER[nextIndex];
+
+      this.scene.start(nextSceneKey);
+    });
+  }
 }
+
+
 
 const SCENE_KEYS = {
   BOOT: 'Boot',
@@ -36,8 +37,8 @@ const SCENE_KEYS = {
 
 const SCENE_ORDER = [
   SCENE_KEYS.MAIN_MENU,
-  SCENE_KEYS.CHARACTER_PREVIEW,
-  SCENE_KEYS.CHARACTER_SELECT,
+  // SCENE_KEYS.CHARACTER_PREVIEW,
+  // SCENE_KEYS.CHARACTER_SELECT,
   SCENE_KEYS.BATTLE,
   SCENE_KEYS.MAIN_GAME,
   SCENE_KEYS.GAME_OVER

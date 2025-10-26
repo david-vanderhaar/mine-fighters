@@ -1,28 +1,40 @@
+import { Steve } from '../characters/Steve.js';
+import { Zombie } from '../characters/Zombie.js';
 import { BaseScene } from './BaseScene.js';
 
-export class Battle extends BaseScene
-{
-    constructor ()
-    {
-        super('Battle');
-    }
+export class Battle extends BaseScene {
+  constructor() {
+    super('Battle');
+    this.players = {};
+  }
 
-    create ()
-    {
-        super.create();
-        this.cameras.main.setBackgroundColor(0x00ff00);
+  init() {
+    this.players = selectedCharacters(this)
+  }
 
-        this.add.image(512, 384, 'background').setAlpha(0.5);
+  create() {
+    super.create();
+    addPageTitle(this, 'Battle!');
 
-        this.add.text(512, 384, 'Battle', {
-            fontFamily: 'Arial Black', fontSize: 38, color: '#ffffff',
-            stroke: '#000000', strokeThickness: 8,
-            align: 'center'
-        }).setOrigin(0.5);
+    Object.values(this.players).forEach((player) => {
+      player.initializeAnimations();
+      player.play('idle');
+      player.initializePhysics();
+    });
+  }
+}
 
-        // on enter key press, start main game
-        this.input.keyboard.once('keydown-ENTER', () => {
-            this.scene.start('MainGame');
-        });
-    }
+function selectedCharacters(game) {
+  return {
+    player_1: Steve(game, {x: 400, y: 470, flipRight: true}),
+    player_2: Zombie(game, {x: 800, y: 470})
+  }
+}
+
+function addPageTitle(scene, title) {
+  scene.add.text(512, 20, title, {
+    fontFamily: 'Arial Black', fontSize: 38, color: '#ffffff',
+    stroke: '#000000', strokeThickness: 8,
+    align: 'center'
+  }).setOrigin(0.5);
 }
