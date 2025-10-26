@@ -15,14 +15,18 @@ export class Battle extends BaseScene {
   create() {
     super.create();
     addPageTitle(this, 'Battle!');
-
-    Object.values(this.players).forEach((player) => {
-      player.initializeAnimations();
-      player.play('idle');
-      player.initializePhysics();
-    });
+    initialzeCharacters(this.players);
   }
 }
+
+function initialzeCharacters(players) {
+  Object.values(players).forEach((player) => {
+    player.initializeAnimations();
+    player.play('idle');
+    player.initializePhysics();
+  });
+}
+
 
 function selectedCharacters(game) {
   return {
