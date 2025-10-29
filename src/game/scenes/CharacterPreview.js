@@ -58,6 +58,18 @@ export class CharacterPreview extends BaseScene {
     drowned.startAnimationPreview();
     this.characters.push(drowned);
 
+    const golem = BaseCharacter(this, {
+      name: 'golem',
+      spritesheetName: 'golem',
+      x: 100,
+      y: 470,
+      flipRight: true
+    });
+
+    golem.initializeAnimations();
+    golem.startAnimationPreview();
+    this.characters.push(golem);
+
     this.input.gamepad.once('connected', function (pad) {
       console.log('Gamepad connected:', pad.id);
     }, this);

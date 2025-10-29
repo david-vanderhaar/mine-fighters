@@ -43,6 +43,11 @@ export class Preloader extends BaseScene {
       'characters/drowned.png', 
       { frameWidth: 48, frameHeight: 48 }
     );
+    this.load.spritesheet(
+      'golem',
+      'characters/golem.png', 
+      { frameWidth: 48, frameHeight: 48 }
+    );
   }
 
   create() {
