@@ -12,8 +12,8 @@ import { AUTO, Game } from 'phaser';
 //  https://docs.phaser.io/api-documentation/typedef/types-core#gameconfig
 const config = {
   type: AUTO,
-  width: 1024,
-  height: 768,
+  width: 1280,
+  height: 720,
   parent: 'game-container',
   backgroundColor: '#141516',
   pixelArt: true,
