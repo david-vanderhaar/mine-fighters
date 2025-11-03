@@ -16,26 +16,16 @@ export class CharacterSelect extends BaseScene {
   create() {
     super.create();
     this.cameras.main.setBackgroundColor('#3b3b44');
-
-    // create keyboard keys used for player 1
-    this.keys = this.input.keyboard.addKeys({
-      left: Phaser.Input.Keyboard.KeyCodes.LEFT,
-      right: Phaser.Input.Keyboard.KeyCodes.RIGHT,
-      a: Phaser.Input.Keyboard.KeyCodes.A,
-      d: Phaser.Input.Keyboard.KeyCodes.D,
-      select: Phaser.Input.Keyboard.KeyCodes.SPACE,
-      enter: Phaser.Input.Keyboard.KeyCodes.ENTER
-    });
-
     this.addScreenTitle();
+
+    this.initializeKeyboardInputKeys();
     this.addSelectedCharacterBoxes();
     this.addSelectableCharacters();
+    this.initializePlayerSelectonData();
+    this.initializePlayerSelectIndicators();
+  }
 
-    // initialize selection indices (clamp to available portraits)
-    const total = Math.max(1, this.selectableCharacterBoxes.length);
-    this.playerSelectionIndex[1] = 0;
-    this.playerSelectionIndex[2] = Math.min(1, total - 1);
-
+  initializePlayerSelectIndicators() {
     // create visual indicators and locked labels for each player
     for (let p = 1; p <= 2; p++) {
       // indicator: transparent rectangle with colored stroke
@@ -58,6 +48,24 @@ export class CharacterSelect extends BaseScene {
     }
   }
 
+  initializePlayerSelectonData() {
+    // initialize selection indices (clamp to available portraits)
+    const total = Math.max(1, this.selectableCharacterBoxes.length);
+    this.playerSelectionIndex[1] = 0;
+    this.playerSelectionIndex[2] = Math.min(1, total - 1);
+  }
+
+  initializeKeyboardInputKeys() {
+    this.keys = this.input.keyboard.addKeys({
+      left: Phaser.Input.Keyboard.KeyCodes.LEFT,
+      right: Phaser.Input.Keyboard.KeyCodes.RIGHT,
+      a: Phaser.Input.Keyboard.KeyCodes.A,
+      d: Phaser.Input.Keyboard.KeyCodes.D,
+      select: Phaser.Input.Keyboard.KeyCodes.SPACE,
+      enter: Phaser.Input.Keyboard.KeyCodes.ENTER
+    });
+  }
+
   update() {
     super.update();
     this.handleInput();
@@ -66,11 +74,6 @@ export class CharacterSelect extends BaseScene {
   // custom methods
 
   handleInput() {
-    // There will be an input for game controller and keyboard/mouse
-    // player 1 users keyboard/mouse
-    // player 2 uses game controller
-
-    // call the class method (was calling a global before)
     this.handlerPlayerSelectInput(1, 'keyboard');
     this.handlerPlayerSelectInput(2, 'gamepad');
   }
