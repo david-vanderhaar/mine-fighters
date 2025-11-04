@@ -111,15 +111,31 @@ export class CharacterSelect extends BaseScene {
 
     // process confirm
     if (confirm) {
-      this.playerConfirmed[playerNumber] = true;
       // show locked label and keep indicator visible
       const indicator = this.playerSelectionIndicators[playerNumber];
       const label = this.playerLockedLabels[playerNumber];
       const box = this.selectableCharacterBoxes[this.playerSelectionIndex[playerNumber]];
+      console.log(box, label, indicator);
+
       if (box && indicator && label) {
         label.setPosition(box.rect.x, box.rect.y + 100);
         label.setVisible(true);
         indicator.setStrokeStyle(6, playerNumber === 1 ? 0x1e90ff : 0x2ecc71);
+
+        this.playerConfirmed[playerNumber] = this.registry.get('characters')[box.characterKey];
+        console.log(this.playerConfirmed[playerNumber], playerNumber);
+        
+        
+        this.registry.set(`player_${playerNumber}_character`, this.playerConfirmed[playerNumber]);
+        console.log(this.registry);
+        // update player selected character visual box with character portrait
+        const selectedX = playerNumber === 1 ? this.cameras.main.width / 4 : (this.cameras.main.width / 4) * 3;
+        const selectedY = 184;
+        const selectedPortrait = this.add.image(selectedX, selectedY, box.characterKey).setOrigin(0.5).setScale(3);
+
+        if (playerNumber === 1) {
+          selectedPortrait.setFlipX(true);
+        }
       }
       // here you could dispatch an event or call a method to notify other parts of the UI
     }

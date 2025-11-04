@@ -1,4 +1,9 @@
 import { BaseScene } from './BaseScene.js';
+import { Steve } from '../characters/Steve.js';
+import { Zombie } from '../characters/Zombie.js';
+import { Piglin } from '../characters/Piglin.js';
+import { Drowned } from '../characters/Drowned.js';
+import { Golem } from '../characters/Golem.js';
 
 export class Preloader extends BaseScene {
   constructor() {
@@ -57,5 +62,18 @@ export class Preloader extends BaseScene {
     //  Move to the MainMenu. You could also swap this for a Scene Transition, such as a camera fade.
     // this.scene.start('MainMenu');
     this.scene.start('CharacterSelect');
+    this.addCharactersToGameData();
+  }
+
+  addCharactersToGameData() {
+    const characters = {
+      steve: Steve,
+      zombie: Zombie,
+      piglin: Piglin,
+      drowned: Drowned,
+      golem: Golem
+    }
+
+    this.registry.set('characters', characters);
   }
 }

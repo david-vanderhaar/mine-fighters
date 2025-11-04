@@ -9,29 +9,32 @@ export class Battle extends BaseScene {
   }
 
   init() {
-    this.players = selectedCharacters(this)
+    
   }
 
   create() {
     super.create();
     addPageTitle(this, 'Battle!');
-    initialzeCharacters(this.players);
+    initialzeCharacters(this);
   }
 }
 
-function initialzeCharacters(players) {
-  Object.values(players).forEach((player) => {
+function initialzeCharacters(scene) {
+  const playerBuilders = selectedCharacters(scene.game);
+  Object.values(playerBuilders).forEach(([builder, args], index) => {
+    const player = builder(scene, args);
     player.initializeAnimations();
     player.play('idle');
     player.initializePhysics();
+    scene.players[`player_${index + 1}`] = player;
   });
 }
 
 
 function selectedCharacters(game) {
   return {
-    player_1: Steve(game, {x: 400, y: 470, flipRight: true}),
-    player_2: Zombie(game, {x: 800, y: 470})
+    player_1: [game.registry.get('player_1_character') || Steve, {x: 400, y: 470, flipRight: true}],
+    player_2: [game.registry.get('player_2_character') || Zombie, {x: 800, y: 470}],
   }
 }
 
