@@ -1,6 +1,7 @@
 import { Steve } from '../characters/Steve.js';
 import { Zombie } from '../characters/Zombie.js';
 import { BaseScene } from './BaseScene.js';
+import { BattleInputHandler } from '../services/BattleInputHandler.js';
 
 export class Battle extends BaseScene {
   constructor() {
@@ -9,14 +10,23 @@ export class Battle extends BaseScene {
   }
 
   init() {
-    
+    // 
   }
 
   create() {
     super.create();
     addPageTitle(this, 'Battle!');
+    // add background image
+    this.add.image(640, 360, 'battle_bg_0');
     initialzeCharacters(this);
+
+    BattleInputHandler(this, this.players.player_1);
+    BattleInputHandler(this, this.players.player_2, 'gamepad');
   }
+
+  // update() {
+    
+  // }
 }
 
 function initialzeCharacters(scene) {

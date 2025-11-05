@@ -1,7 +1,7 @@
 export function BaseCharacter(scene, {
   name = 'BaseCharacter',
   health = 10,
-  speed = 10,
+  speed = 5,
   attack = 1,
   spritesheetName = 'default',
   x = 600,
@@ -72,7 +72,7 @@ function initializeAnimations(scene, spritesheetName) {
     key: spritesheetName + '-walk',
     frames: scene.anims.generateFrameNumbers(spritesheetName, { frames: [4, 5, 6, 7] }),
     frameRate: 8,
-    // repeat: -1
+    repeat: -1
   });
 
   scene.anims.create({
