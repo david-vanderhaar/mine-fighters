@@ -10,9 +10,11 @@ function BattleGamepadInputHandler(scene, player) {
   // scene.input.gamepad.once('connected', (pad) => {
   // });
   scene.input.gamepad.on('down', (pad, button, index) => {
+    if (!player.inputEnabled) return;
     handleGamepadButtonInput(button, [player]);
   });
   scene.input.gamepad.on('up', (pad, button, index) => {
+    if (!player.inputEnabled) return;
     handleGamepadButtonRelease(button, [player]);
   });
 }
@@ -33,7 +35,7 @@ function handleGamepadButtonInput(button, players) {
         break;
       case 12: // up
         if (sprite.body.onFloor()) {
-          sprite.body.setVelocityY(-400);
+          sprite.body.setVelocityY(player.jumpStrength * -100);
           player.play('jump');
         }
         break;
@@ -96,7 +98,7 @@ function handleKeyInput(event, players, cursors, wasdKeys) {
       player.play('walk');
     } else if (keyCode === cursors.up.keyCode || keyCode === wasdKeys.up.keyCode) {
       if (sprite.body.onFloor()) {
-        sprite.body.setVelocityY(-400);
+        sprite.body.setVelocityY(player.jumpStrength * -100);
         player.play('jump');
       }
     } else if (keyCode === cursors.space.keyCode || keyCode === wasdKeys.space.keyCode) {

@@ -19,9 +19,83 @@ export class Battle extends BaseScene {
     // add background image
     this.add.image(640, 360, 'battle_bg_0');
     initialzeCharacters(this);
+    this.setupPhysics();
 
     BattleInputHandler(this, this.players.player_1);
     BattleInputHandler(this, this.players.player_2, 'gamepad');
+  }
+
+  setupPhysics() {
+    this.collisionSetup();
+    this.hitHurtSetup();
+  }
+
+  collisionSetup() {
+    this.physics.add.collider(
+      this.players.player_1.sprite,
+      this.players.player_2.sprite,
+      (player1Sprite, player2Sprite) => {
+        // make them stop so they don't overlap
+        player1Sprite.body.setVelocityX(0);
+        player2Sprite.body.setVelocityX(0);
+        // play idle animation
+        this.players.player_1.play('idle');
+        this.players.player_2.play('idle');
+      }
+    );
+  }
+
+  hitHurtSetup() {
+    // when any player punches or kicks, check for overlap with the other player
+    Object.values(this.players).forEach((attacker) => {
+      const attackerSprite = attacker.sprite;
+      ['punch', 'kick'].forEach((attackType) => {
+        // when attacker animation name matches "attacker.spriteSheetName-attackType"
+        attackerSprite.on(Phaser.Animations.Events.ANIMATION_COMPLETE_KEY + attacker.spritesheetName + '-' + attackType, () => {
+          Object.values(this.players).forEach((defender) => {
+            if (attacker !== defender) {
+              const defenderSprite = defender.sprite;
+              // check for overlap
+              if (Phaser.Geom.Intersects.RectangleToRectangle(
+                // attackerSprite.getBounds(),
+                // defenderSprite.getBounds()
+                // bodies for more accurate hitbox
+                attackerSprite.body,
+                defenderSprite.body
+              )) {
+                // reduce defender health
+                defender.health -= attacker.attack;
+                // flash defender sprite to indicate hit
+                this.tweens.add({
+                  targets: defenderSprite,
+                  alpha: 0,
+                  duration: 100,
+                  ease: 'Linear',
+                  yoyo: true,
+                  repeat: 3
+                });
+                console.log(`${defender.name} hit! Health: ${defender.health}`);
+                if (defender.health <= 0) {
+                  defender.play('die');
+                  console.log(`${defender.name} defeated!`);
+                  // disable defender physics body
+                  defender.sprite.body.enable = false;
+                  // disable input for both players so animations can't be interrupted
+                  Object.values(this.players).forEach((player) => {
+                    player.inputEnabled = false;
+                  });
+
+                  // stop attacker from moving
+                  attacker.sprite.body.setVelocityX(0);
+                  attacker.play('win');
+
+                }
+              }
+            }
+          });
+        });
+      });
+    });
   }
 
   // update() {

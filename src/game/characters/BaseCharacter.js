@@ -3,23 +3,35 @@ export function BaseCharacter(scene, {
   health = 10,
   speed = 5,
   attack = 1,
+  jumpStrength = 10,
   spritesheetName = 'default',
   x = 600,
   y = 370,
-  flipRight = false
+  flipRight = false,
+  inputEnabled = true,
 }) {
   const sprite = initializeSprite(scene, x, y, flipRight);
   return {
     name,
     health,
     speed,
+    jumpStrength,
     attack,
     sprite,
+    spritesheetName,
+    inputEnabled,
     initializeAnimations: () => initializeAnimations(scene, spritesheetName),
     startAnimationPreview: () => startAnimationPreview(scene, sprite, spritesheetName, x, y),
     initializePhysics: () => {
       scene.physics.add.existing(sprite);
       sprite.body.setCollideWorldBounds(true);
+      
+      // sprite.body.setCollidesWith(['hitbox']);
+      // sprite.body.setCollisionCategory('hitbox');
+
+      // set collider width
+      sprite.body.setSize(sprite.width / 2, sprite.height / 1.5);
+      sprite.body.setOffset(sprite.width / 4, sprite.height / 3);
       sprite.body.setGravity(0, 1000);
       sprite.body.setMaxVelocity(600, 600)
     },
