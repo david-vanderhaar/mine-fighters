@@ -2,6 +2,7 @@ import { Steve } from '../characters/Steve.js';
 import { Zombie } from '../characters/Zombie.js';
 import { BaseScene } from './BaseScene.js';
 import { BattleInputHandler } from '../services/BattleInputHandler.js';
+import { HealthBar } from '../services/HealthBar.js';
 
 export class Battle extends BaseScene {
   constructor() {
@@ -20,9 +21,24 @@ export class Battle extends BaseScene {
     this.add.image(640, 360, 'battle_bg_0');
     initialzeCharacters(this);
     this.setupPhysics();
+    this.setupUI();
 
     BattleInputHandler(this, this.players.player_1);
     BattleInputHandler(this, this.players.player_2, 'gamepad');
+  }
+
+  setupUI() {
+    this.setupHealthBars();
+  }
+
+  setupHealthBars() {
+    // player 1 health bar
+    const player1HealthBar = new HealthBar(this, 20, 20, this.players.player_1.health);
+    this.players.player_1['healthBar'] = player1HealthBar;
+
+    // player 2 health bar
+    const player2HealthBar = new HealthBar(this, 1000, 20, this.players.player_2.health);
+    this.players.player_2['healthBar'] = player2HealthBar;
   }
 
   setupPhysics() {
@@ -65,6 +81,8 @@ export class Battle extends BaseScene {
               )) {
                 // reduce defender health
                 defender.health -= attacker.attack;
+                // update defender health bar
+                this.updateHealthbar(defender, attacker.attack);
                 // flash defender sprite to indicate hit
                 this.tweens.add({
                   targets: defenderSprite,
@@ -98,9 +116,14 @@ export class Battle extends BaseScene {
     });
   }
 
-  // update() {
-    
-  // }
+
+  updateHealthbar(defender, damage) {
+    const healthBar = defender.healthBar;
+    const isDead = healthBar.decrease(damage);
+    if (isDead) {
+      console.log(`${defender.name} health bar depleted!`);
+    }
+  }
 }
 
 function initialzeCharacters(scene) {

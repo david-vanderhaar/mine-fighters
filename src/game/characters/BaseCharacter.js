@@ -14,6 +14,7 @@ export function BaseCharacter(scene, {
   return {
     name,
     health,
+    currentHealth: health,
     speed,
     jumpStrength,
     attack,
