@@ -37,7 +37,7 @@ export class Battle extends BaseScene {
     this.players.player_1['healthBar'] = player1HealthBar;
 
     // player 2 health bar
-    const player2HealthBar = new HealthBar(this, 1000, 20, this.players.player_2.health);
+    const player2HealthBar = new HealthBar(this, 840, 20, this.players.player_2.health);
     this.players.player_2['healthBar'] = player2HealthBar;
   }
 
