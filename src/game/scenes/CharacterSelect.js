@@ -23,6 +23,53 @@ export class CharacterSelect extends BaseScene {
     this.addSelectableCharacters();
     this.initializePlayerSelectonData();
     this.initializePlayerSelectIndicators();
+
+    this.initializeTouchSelectInput();
+  }
+
+  initializeTouchSelectInput() {
+    // touch input: simple left/right tap areas and a confirm button
+    const width = (this.scale && this.scale.width) || (this.cameras && this.cameras.main && this.cameras.main.width) || 800;
+    const height = (this.scale && this.scale.height) || (this.cameras && this.cameras.main && this.cameras.main.height) || 600;
+
+    // left half for player 1, right half for player 2
+    this.input.on('pointerdown', (pointer) => {
+      const x = pointer.x;
+      const y = pointer.y;
+
+      if (x < width / 2) {
+        // player 1 area
+        if (y < height / 2) {
+          // upper half: move left
+          this.handlerPlayerSelectInput(1, 'touch-left');
+        } else {
+          // lower half: move right
+          this.handlerPlayerSelectInput(1, 'touch-right');
+        }
+      } else {
+        // player 2 area
+        if (y < height / 2) {
+          // upper half: move left
+          this.handlerPlayerSelectInput(2, 'touch-left');
+        } else {
+          // lower half: move right
+          this.handlerPlayerSelectInput(2, 'touch-right');
+        }
+      }
+    });
+
+    // confirm button in the center bottom
+    const confirmButton = this.add.text(width / 2, height - 50, 'Confirm', {
+      fontFamily: 'Arial', fontSize: 24, color: '#ffffff',
+      backgroundColor: '#000000',
+      padding: { left: 10, right: 10, top: 5, bottom: 5 }
+    }).setOrigin(0.5).setInteractive({ useHandCursor: true });
+
+    confirmButton.on('pointerdown', () => {
+      // confirm for both players
+      this.handlerPlayerSelectInput(1, 'touch-confirm');
+      this.handlerPlayerSelectInput(2, 'touch-confirm');
+    });
   }
 
   initializePlayerSelectIndicators() {
@@ -95,6 +142,12 @@ export class CharacterSelect extends BaseScene {
       ({ move, confirm } = this.handleKeyboardInput(playerNumber, now, cooldown, move, confirm));
     } else if (inputType === 'gamepad') {
       ({ move, confirm } = this.handleGamepadInput(playerNumber, now, cooldown, move, confirm));
+    } else if (inputType === 'touch-left') {
+      move = -1;
+    } else if (inputType === 'touch-right') {
+      move = 1;
+    } else if (inputType === 'touch-confirm') {
+      confirm = true;
     }
 
     // process move

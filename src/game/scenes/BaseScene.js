@@ -7,18 +7,34 @@ export class BaseScene extends Scene {
 
   create() {
     // on enter key press, start next scene
-    this.goToNextSceneOnEnter();      
+    this.input.keyboard.once('keydown-ENTER', () => {
+      this.goToNextSceneOnEnter();      
+    });
+
+    // add button to go to next scene for touch devices
+    const width = (this.scale && this.scale.width) || (this.cameras && this.cameras.main && this.cameras.main.width) || 800;
+    const height = (this.scale && this.scale.height) || (this.cameras && this.cameras.main && this.cameras.main.height) || 600;
+    const nextButton = this.add.text(width / 2, 100, 'Next', { fontSize: '16px', color: '#ffffff' })
+      .setOrigin(1, 1)
+      .setInteractive({ useHandCursor: true })
+      .on('pointerdown', () => this.goToNextSceneOnEnter());
+
+    // keep button on top and fixed to camera if needed
+    try {
+      nextButton.setDepth(1000);
+      nextButton.setScrollFactor(0);
+    } catch (e) {
+      // some Phaser builds may not support setScrollFactor on text; ignore
+    }
   }
 
   goToNextSceneOnEnter() {
-    this.input.keyboard.once('keydown-ENTER', () => {
-      const currentSceneKey = this.scene.key;
-      const currentIndex = SCENE_ORDER.indexOf(currentSceneKey);
-      const nextIndex = (currentIndex + 1) % SCENE_ORDER.length;
-      const nextSceneKey = SCENE_ORDER[nextIndex];
+    const currentSceneKey = this.scene.key;
+    const currentIndex = SCENE_ORDER.indexOf(currentSceneKey);
+    const nextIndex = (currentIndex + 1) % SCENE_ORDER.length;
+    const nextSceneKey = SCENE_ORDER[nextIndex];
 
-      this.scene.start(nextSceneKey);
-    });
+    this.scene.start(nextSceneKey);
   }
 }
 
