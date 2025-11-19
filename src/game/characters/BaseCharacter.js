@@ -118,7 +118,7 @@ function initializeAnimations(scene, spritesheetName) {
     frames: scene.anims.generateFrameNumbers(spritesheetName, { frames: [24, 25] }),
     frameRate: 8,
     repeat: -1,
-    repeatDelay: 1000
+    repeatDelay: 500
   });
 
   scene.anims.create({

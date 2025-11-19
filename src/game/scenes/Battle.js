@@ -2,6 +2,7 @@ import { Steve } from '../characters/Steve.js';
 import { Zombie } from '../characters/Zombie.js';
 import { BaseScene } from './BaseScene.js';
 import { BattleInputHandler } from '../services/BattleInputHandler.js';
+import { BattleRealtimeInputHandler } from '../services/BattleRealtimeInputHandler.js';
 import { HealthBar } from '../services/HealthBar.js';
 
 export class Battle extends BaseScene {
@@ -23,8 +24,20 @@ export class Battle extends BaseScene {
     this.setupPhysics();
     this.setupUI();
 
-    BattleInputHandler(this, this.players.player_1);
-    BattleInputHandler(this, this.players.player_2, 'gamepad');
+    // BattleInputHandler(this, this.players.player_1);
+    // BattleInputHandler(this, this.players.player_2, 'gamepad');
+
+    const inputHandler1 = BattleRealtimeInputHandler(this, this.players.player_1);
+    const inputHandler2 = BattleRealtimeInputHandler(this, this.players.player_2, 'gamepad');
+    this.realtimeInputHandlers = [inputHandler1, inputHandler2];
+  }
+
+  update(time, delta) {
+    super.update(time, delta);
+    // update realtime input handlers
+    this.realtimeInputHandlers.forEach((handler) => {
+      handler.update();
+    });
   }
 
   setupUI() {
@@ -55,8 +68,8 @@ export class Battle extends BaseScene {
         player1Sprite.body.setVelocityX(0);
         player2Sprite.body.setVelocityX(0);
         // play idle animation
-        this.players.player_1.play('idle');
-        this.players.player_2.play('idle');
+        // this.players.player_1.play('idle');
+        // this.players.player_2.play('idle');
       }
     );
   }
@@ -67,17 +80,35 @@ export class Battle extends BaseScene {
       const attackerSprite = attacker.sprite;
       ['punch', 'kick'].forEach((attackType) => {
         // when attacker animation name matches "attacker.spriteSheetName-attackType"
-        attackerSprite.on(Phaser.Animations.Events.ANIMATION_COMPLETE_KEY + attacker.spritesheetName + '-' + attackType, () => {
+        // trigger the hit if touching when animation frame > 2 (to sync with hit frame)
+        attackerSprite.on(Phaser.Animations.Events.ANIMATION_UPDATE, (animation, frame) => {
+          const animName = `${attacker.spritesheetName}-${attackType}`;
+          if (animation.key !== animName) return;
+          if (frame.index !== 3) return; // only trigger on frame 3 or higher
           Object.values(this.players).forEach((defender) => {
             if (attacker !== defender) {
               const defenderSprite = defender.sprite;
+
+              // const defenderBox = defenderSprite.getBounds();
+              const defenderBox = defenderSprite.body;
+
+              const attackerBox = attackerSprite.getBounds();
+              // attacker hitbox offset
+              if (attackerSprite.flipX) {
+                // facing left
+                attackerBox.x -= attackerBox.width * 0.1;
+              } else {
+                // facing right
+                attackerBox.x += attackerBox.width * 0.1;
+              }
               // check for overlap
+              
               if (Phaser.Geom.Intersects.RectangleToRectangle(
                 // attackerSprite.getBounds(),
                 // defenderSprite.getBounds()
                 // bodies for more accurate hitbox
-                attackerSprite.body,
-                defenderSprite.body
+                attackerBox,
+                defenderBox
               )) {
                 // reduce defender health
                 defender.health -= attacker.attack;
@@ -87,10 +118,24 @@ export class Battle extends BaseScene {
                 this.tweens.add({
                   targets: defenderSprite,
                   alpha: 0,
-                  duration: 100,
+                  duration: 40,
                   ease: 'Linear',
                   yoyo: true,
                   repeat: 3
+                });
+                // knockback defender
+                const knockbackVelocity = 2000;
+                if (defenderSprite.x < attackerSprite.x) {
+                  // defender is to the left of attacker, knockback left
+                  defenderSprite.body.setVelocityX(-knockbackVelocity);
+                } else {
+                  // defender is to the right of attacker, knockback right
+                  defenderSprite.body.setVelocityX(knockbackVelocity);
+                }
+                // disable defender movement briefly
+                defender.inputEnabled = false;
+                this.time.delayedCall(200, () => {
+                  defender.inputEnabled = true;
                 });
                 console.log(`${defender.name} hit! Health: ${defender.health}`);
                 if (defender.health <= 0) {

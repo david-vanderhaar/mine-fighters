@@ -7,8 +7,6 @@ export function BattleInputHandler(scene, player, type='keyboard') {
 }
 
 function BattleGamepadInputHandler(scene, player) {
-  // scene.input.gamepad.once('connected', (pad) => {
-  // });
   scene.input.gamepad.on('down', (pad, button, index) => {
     if (!player.inputEnabled) return;
     handleGamepadButtonInput(button, [player]);
