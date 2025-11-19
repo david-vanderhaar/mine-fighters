@@ -3,6 +3,7 @@ import { Zombie } from '../characters/Zombie.js';
 import { BaseScene } from './BaseScene.js';
 import { BattleInputHandler } from '../services/BattleInputHandler.js';
 import { BattleRealtimeInputHandler } from '../services/BattleRealtimeInputHandler.js';
+import { BattleRealtimeTouchInputHandler } from '../services/BattleRealtimeTouchInputHandler.js';
 import { HealthBar } from '../services/HealthBar.js';
 
 export class Battle extends BaseScene {
@@ -30,6 +31,17 @@ export class Battle extends BaseScene {
     const inputHandler1 = BattleRealtimeInputHandler(this, this.players.player_1);
     const inputHandler2 = BattleRealtimeInputHandler(this, this.players.player_2, 'gamepad');
     this.realtimeInputHandlers = [inputHandler1, inputHandler2];
+
+    const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0;
+    if (isTouchDevice) {
+      const touchInputHandler1 = BattleRealtimeTouchInputHandler(this, this.players.player_1, 'left');
+      const touchInputHandler2 = BattleRealtimeTouchInputHandler(this, this.players.player_2, 'right');
+      this.realtimeInputHandlers.push(touchInputHandler1);
+      this.realtimeInputHandlers.push(touchInputHandler2);
+
+      touchInputHandler1.setup();
+      touchInputHandler2.setup();
+    }
   }
 
   update(time, delta) {
