@@ -14,6 +14,8 @@ export class Boot extends BaseScene
 
         this.load.image('background', 'assets/title_bg.png');
         this.load.image('battle_bg_0', 'resources/battle_bg_0.png');
+        this.load.image('battle_bg_1', 'resources/battle_bg_1.png');
+        this.load.audio('hit', 'assets/sounds/hit.wav');
     }
 
     create ()

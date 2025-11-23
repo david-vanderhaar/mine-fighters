@@ -48,14 +48,22 @@ export function BattleRealtimeTouchInputHandler(scene, player, side = 'left') {
 	}
 
 	// State for touch controls
+	// Use Sets of pointer ids so multiple touches don't clobber each other.
 	const state = {
-		left: false,
-		right: false,
-		jumpPressed: false, // edge (set true on pointerdown, cleared after processed)
-		punchPressed: false,
-		kickPressed: false,
+		presses: {
+			left: new Set(),
+			right: new Set(),
+			jump: new Set(), // edge-detected via prevEdge
+			punch: new Set(),
+			kick: new Set()
+		},
+		prevEdge: {
+			jump: false,
+			punch: false,
+			kick: false
+		},
 		container: null,
-		buttons: {}
+		buttons: {} // UI button objects
 	};
 
 	// Create a simple UI button (circle + label). Returns an object with the interactive shape and label.
@@ -103,47 +111,45 @@ export function BattleRealtimeTouchInputHandler(scene, player, side = 'left') {
 		state.container = uiContainer;
 		state.buttons = { leftBtn, rightBtn, jumpBtn, punchBtn, kickBtn };
 
-		// Helper to add pointer handlers
-		function bindPress(obj, handlers) {
+		// Ensure multiple pointers are available for multitouch (do this once)
+		try {
+			if (scene && scene.input && scene.input.addPointer && !scene._multiTouchConfiguredForBattleRealtime) {
+				// Add a few extra pointers; default platform pointer count may be limited
+				scene.input.addPointer(5);
+				scene._multiTouchConfiguredForBattleRealtime = true;
+			}
+		} catch (e) {}
+
+		// Helper to add pointer handlers; track pointer ids in a Set
+		function bindPress(obj, setKey, isEdge = false) {
 			const interactive = obj.circle;
 			interactive.on('pointerdown', (pointer) => {
-				handlers.down(pointer);
+				console.log('[touch] down', setKey, 'id=', pointer.id, 'x=', pointer.x, 'y=', pointer.y);
+				state.presses[setKey].add(pointer.id);
 			});
 			interactive.on('pointerup', (pointer) => {
-				handlers.up(pointer);
+				console.log('[touch] up', setKey, 'id=', pointer.id);
+				state.presses[setKey].delete(pointer.id);
 			});
 			// pointerout should also reset (finger dragged away)
 			interactive.on('pointerout', (pointer) => {
-				handlers.up(pointer);
+				console.log('[touch] out', setKey, 'id=', pointer.id);
+				state.presses[setKey].delete(pointer.id);
 			});
-			// pointermove while down: keep state true
+			// pointermove while down: keep state active for that pointer
 			interactive.on('pointermove', (pointer) => {
 				if (pointer.isDown) {
-					handlers.down(pointer);
+					console.log('[touch] move (down)', setKey, 'id=', pointer.id, 'x=', pointer.x, 'y=', pointer.y);
+					state.presses[setKey].add(pointer.id);
 				}
 			});
 		}
 
-		bindPress(leftBtn, {
-			down: () => { state.left = true; },
-			up: () => { state.left = false; }
-		});
-		bindPress(rightBtn, {
-			down: () => { state.right = true; },
-			up: () => { state.right = false; }
-		});
-		bindPress(jumpBtn, {
-			down: () => { state.jumpPressed = true; },
-			up: () => { /* no-op - we treat jump as edge when pointerdown */ }
-		});
-		bindPress(punchBtn, {
-			down: () => { state.punchPressed = true; },
-			up: () => { /* no-op - treat as edge */ }
-		});
-		bindPress(kickBtn, {
-			down: () => { state.kickPressed = true; },
-			up: () => { /* no-op - treat as edge */ }
-		});
+		bindPress(leftBtn, 'left');
+		bindPress(rightBtn, 'right');
+		bindPress(jumpBtn, 'jump', true);
+		bindPress(punchBtn, 'punch', true);
+		bindPress(kickBtn, 'kick', true);
 
 		return uiContainer;
 	}
@@ -163,12 +169,17 @@ export function BattleRealtimeTouchInputHandler(scene, player, side = 'left') {
 
 		if (!sprite || !sprite.body) return;
 
-		// Horizontal movement
-		if (state.left) {
+		// Horizontal movement (check Sets)
+		const leftActive = state.presses.left.size > 0;
+		const rightActive = state.presses.right.size > 0;
+
+		if (leftActive) {
+			console.log('[touch] update -> leftActive for', player.name || player.spritesheetName || 'player');
 			sprite.body.setVelocityX(-player.speed * 100);
 			sprite.flipX = false;
 			if (sprite.body.onFloor()) tryPlay('walk');
-		} else if (state.right) {
+		} else if (rightActive) {
+			console.log('[touch] update -> rightActive for', player.name || player.spritesheetName || 'player');
 			sprite.body.setVelocityX(player.speed * 100);
 			sprite.flipX = true;
 			if (sprite.body.onFloor()) tryPlay('walk');
@@ -177,24 +188,34 @@ export function BattleRealtimeTouchInputHandler(scene, player, side = 'left') {
 			if (sprite.body.onFloor() && player.health > 0) tryPlay('idle');
 		}
 
-		// Jump (edge-detect)
-		if (state.jumpPressed && sprite.body.onFloor()) {
+		// Edge detection for jump/punch/kick
+		const jumpActive = state.presses.jump.size > 0;
+		const punchActive = state.presses.punch.size > 0;
+		const kickActive = state.presses.kick.size > 0;
+
+		const jumpEdge = jumpActive && !state.prevEdge.jump;
+		const punchEdge = punchActive && !state.prevEdge.punch;
+		const kickEdge = kickActive && !state.prevEdge.kick;
+
+		if (jumpEdge && sprite.body.onFloor()) {
+			console.log('[touch] jumpEdge for', player.name || player.spritesheetName || 'player');
 			sprite.body.setVelocityY(player.jumpStrength * -100);
 			tryPlay('jump');
 		}
 
-		// Punch / Kick (edge)
-		if (state.punchPressed) {
+		if (punchEdge) {
+			console.log('[touch] punchEdge for', player.name || player.spritesheetName || 'player');
 			tryPlay('punch');
 		}
-		if (state.kickPressed) {
+		if (kickEdge) {
+			console.log('[touch] kickEdge for', player.name || player.spritesheetName || 'player');
 			tryPlay('kick');
 		}
 
-		// Clear edge presses after they've been considered, so a new touch is required
-		state.jumpPressed = false;
-		state.punchPressed = false;
-		state.kickPressed = false;
+		// Update previous-edge trackers so a press fires only once per touch
+		state.prevEdge.jump = jumpActive;
+		state.prevEdge.punch = punchActive;
+		state.prevEdge.kick = kickActive;
 	}
 
 	return { update, setup };

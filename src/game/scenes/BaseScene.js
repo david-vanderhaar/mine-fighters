@@ -12,6 +12,14 @@ export class BaseScene extends Scene {
     });
 
     // add button to go to next scene for touch devices
+    this.setupTouchControls();
+  }
+
+  setupTouchControls() {
+    // if touch not supported, skip
+    if (!this.sys.game.device.input.touch) return;
+    // if touch controls already set up, skip
+    if (this.nextButton) return;
     const width = (this.scale && this.scale.width) || (this.cameras && this.cameras.main && this.cameras.main.width) || 800;
     const height = (this.scale && this.scale.height) || (this.cameras && this.cameras.main && this.cameras.main.height) || 600;
     const nextButton = this.add.text(width / 2, 100, 'Next', { fontSize: '16px', color: '#ffffff' })

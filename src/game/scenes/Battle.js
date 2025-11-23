@@ -20,19 +20,29 @@ export class Battle extends BaseScene {
     super.create();
     addPageTitle(this, 'Battle!');
     // add background image
-    this.add.image(640, 360, 'battle_bg_0');
+    // this.add.image(640, 360, 'battle_bg_0');
+    this.add.image(640, 360, 'battle_bg_1');
     initialzeCharacters(this);
     this.setupPhysics();
     this.setupUI();
 
+    this.setupPhysicalInput();
+    this.setupTouchInput();
+  }
+
+  setupPhysicalInput() {
     // BattleInputHandler(this, this.players.player_1);
     // BattleInputHandler(this, this.players.player_2, 'gamepad');
-
     const inputHandler1 = BattleRealtimeInputHandler(this, this.players.player_1);
     const inputHandler2 = BattleRealtimeInputHandler(this, this.players.player_2, 'gamepad');
     this.realtimeInputHandlers = [inputHandler1, inputHandler2];
+  }
 
-    const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0;
+  setupTouchInput() {
+    // const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0;
+    // if touch supported, add touch input handlers
+    const isTouchDevice = this.sys.game.device.input.touch;
+
     if (isTouchDevice) {
       const touchInputHandler1 = BattleRealtimeTouchInputHandler(this, this.players.player_1, 'left');
       const touchInputHandler2 = BattleRealtimeTouchInputHandler(this, this.players.player_2, 'right');
@@ -126,6 +136,7 @@ export class Battle extends BaseScene {
                 defender.health -= attacker.attack;
                 // update defender health bar
                 this.updateHealthbar(defender, attacker.attack);
+                this.sound.play('hit');
                 // flash defender sprite to indicate hit
                 this.tweens.add({
                   targets: defenderSprite,
