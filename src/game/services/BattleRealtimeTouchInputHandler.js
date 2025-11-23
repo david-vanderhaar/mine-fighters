@@ -1,3 +1,5 @@
+import { initPlayerInputState, setSourceIntent, clearSourceIntent } from './InputAggregator.js';
+
 export function BattleRealtimeTouchInputHandler(scene, player, side = 'left') {
 	// Initialize per-player animation lock store and an animation-complete listener (only once)
 	if (!player._animLocks) {
@@ -172,21 +174,13 @@ export function BattleRealtimeTouchInputHandler(scene, player, side = 'left') {
 		// Horizontal movement (check Sets)
 		const leftActive = state.presses.left.size > 0;
 		const rightActive = state.presses.right.size > 0;
-
-		if (leftActive) {
-			console.log('[touch] update -> leftActive for', player.name || player.spritesheetName || 'player');
-			sprite.body.setVelocityX(-player.speed * 100);
-			sprite.flipX = false;
-			if (sprite.body.onFloor()) tryPlay('walk');
-		} else if (rightActive) {
-			console.log('[touch] update -> rightActive for', player.name || player.spritesheetName || 'player');
-			sprite.body.setVelocityX(player.speed * 100);
-			sprite.flipX = true;
-			if (sprite.body.onFloor()) tryPlay('walk');
-		} else {
-			sprite.body.setVelocityX(0);
-			if (sprite.body.onFloor() && player.health > 0) tryPlay('idle');
-		}
+		let axis = 0;
+		if (leftActive && !rightActive) axis = -1;
+		else if (rightActive && !leftActive) axis = 1;
+		// Publish touch intent to aggregator
+		setSourceIntent(player, 'touch', { left: leftActive, right: rightActive, axisX: axis });
+		if (axis !== 0 && sprite.body.onFloor()) tryPlay('walk');
+		if (axis === 0 && sprite.body.onFloor() && player.health > 0) tryPlay('idle');
 
 		// Edge detection for jump/punch/kick
 		const jumpActive = state.presses.jump.size > 0;

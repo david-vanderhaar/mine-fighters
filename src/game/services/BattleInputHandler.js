@@ -1,4 +1,7 @@
+import { initPlayerInputState, setSourceIntent, clearSourceIntent } from './InputAggregator.js';
+
 export function BattleInputHandler(scene, player, type='keyboard') {
+  initPlayerInputState(player);
   if (type === 'keyboard') {
     BattleKeyboardInputHandler(scene, player);
   } else if (type === 'gamepad') {
@@ -22,14 +25,12 @@ function handleGamepadButtonInput(button, players) {
     const sprite = player.sprite;
     switch (button.index) {
       case 14: // left
-        sprite.body.setVelocityX(-player.speed * 100);
-        sprite.flipX = false;
-        player.play('walk');
+        setSourceIntent(player, 'gamepad', { left: true, right: false, axisX: -1 });
+        if (sprite && sprite.body && sprite.body.onFloor()) player.play('walk');
         break;
       case 15: // right
-        sprite.body.setVelocityX(player.speed * 100);
-        sprite.flipX = true;
-        player.play('walk');
+        setSourceIntent(player, 'gamepad', { left: false, right: true, axisX: 1 });
+        if (sprite && sprite.body && sprite.body.onFloor()) player.play('walk');
         break;
       case 12: // up
         if (sprite.body.onFloor()) {
@@ -53,8 +54,9 @@ function handleGamepadButtonRelease(button, players) {
     switch (button.index) {
       case 14: // left
       case 15: // right
-        sprite.body.setVelocityX(0);
-        if (sprite.body.onFloor()) {
+        // clear directional intent for gamepad when D-pad released
+        setSourceIntent(player, 'gamepad', { left: false, right: false, axisX: 0 });
+        if (sprite && sprite.body && sprite.body.onFloor()) {
           player.play('idle');
         }
         break;
@@ -86,14 +88,16 @@ function handleKeyInput(event, players, cursors, wasdKeys) {
   Object.values(players).forEach((player) => {
     // debugger;
     const sprite = player.sprite;
-    if (keyCode === cursors.left.keyCode || keyCode === wasdKeys.left.keyCode) {
-      sprite.body.setVelocityX(-player.speed * 100);
-      sprite.flipX = false;
-      player.play('walk');
-    } else if (keyCode === cursors.right.keyCode || keyCode === wasdKeys.right.keyCode) {
-      sprite.body.setVelocityX(player.speed * 100);
-      sprite.flipX = true;
-      player.play('walk');
+    // update keyboard intent based on current held keys
+    const leftActive = (cursors.left && cursors.left.isDown) || (wasdKeys.left && wasdKeys.left.isDown);
+    const rightActive = (cursors.right && cursors.right.isDown) || (wasdKeys.right && wasdKeys.right.isDown);
+    let axis = 0;
+    if (leftActive && !rightActive) axis = -1;
+    else if (rightActive && !leftActive) axis = 1;
+    setSourceIntent(player, 'keyboard', { left: leftActive, right: rightActive, axisX: axis });
+    if (axis !== 0 && sprite && sprite.body && sprite.body.onFloor()) player.play('walk');
+    if (axis === 0 && sprite && sprite.body && sprite.body.onFloor()) {
+      player.play('idle');
     } else if (keyCode === cursors.up.keyCode || keyCode === wasdKeys.up.keyCode) {
       if (sprite.body.onFloor()) {
         sprite.body.setVelocityY(player.jumpStrength * -100);
@@ -117,8 +121,13 @@ function handleKeyRelease(event, players, cursors, wasdKeys) {
       keyCode === cursors.right.keyCode || 
       keyCode === wasdKeys.right.keyCode
     ) {
-      sprite.body.setVelocityX(0);
-      if (sprite.body.onFloor()) {
+      const leftActive = (cursors.left && cursors.left.isDown) || (wasdKeys.left && wasdKeys.left.isDown);
+      const rightActive = (cursors.right && cursors.right.isDown) || (wasdKeys.right && wasdKeys.right.isDown);
+      let axis = 0;
+      if (leftActive && !rightActive) axis = -1;
+      else if (rightActive && !leftActive) axis = 1;
+      setSourceIntent(player, 'keyboard', { left: leftActive, right: rightActive, axisX: axis });
+      if (axis === 0 && sprite && sprite.body && sprite.body.onFloor()) {
         player.play('idle');
       }
     }

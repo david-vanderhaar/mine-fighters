@@ -39,13 +39,13 @@ export class Battle extends BaseScene {
   }
 
   setupTouchInput() {
-    // const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0;
     // if touch supported, add touch input handlers
     const isTouchDevice = this.sys.game.device.input.touch;
 
     if (isTouchDevice) {
       const touchInputHandler1 = BattleRealtimeTouchInputHandler(this, this.players.player_1, 'left');
       const touchInputHandler2 = BattleRealtimeTouchInputHandler(this, this.players.player_2, 'right');
+
       this.realtimeInputHandlers.push(touchInputHandler1);
       this.realtimeInputHandlers.push(touchInputHandler2);
 

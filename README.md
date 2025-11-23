@@ -32,12 +32,12 @@
     * ~~move selector with input~~  
   * fight screen  
     * character [state machines](https://osmose.ceo/blog/phaser-finite-state-machine/) or implement [mine](https://github.com/david-vanderhaar/pixel-brawl/blob/master/src/state-machines/actionFSM.js) again from [this library](https://github.com/jakesgordon/javascript-state-machine)  
-    * input system  
+    * ~~input system~~  
       * pull [input system from pxel-brawl](https://github.com/david-vanderhaar/pixel-brawl/blob/master/src/actor/input.js)  
-      * movement  
-      * attacks  
-    * attacks (hurtbox)  
-    * take damage (hit box)  
+      * ~~movement~~  
+      * ~~attacks~~  
+    * ~~attacks (hurtbox)~~  
+    * ~~take damage (hit box)~~  
     * data (stats, asset references)  
       * speed  
       * jump height  
@@ -63,5 +63,5 @@
       * ~~art: drowned~~  
       * ~~art: golem~~  
     * sounds
-        * hit  
+        * ~~hit~~  
 

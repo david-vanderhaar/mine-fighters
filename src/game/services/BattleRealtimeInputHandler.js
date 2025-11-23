@@ -1,3 +1,5 @@
+import { initPlayerInputState, setSourceIntent, clearSourceIntent } from './InputAggregator.js';
+
 export function BattleRealtimeInputHandler(scene, player, type = 'keyboard') {
 	// Initialize per-player animation lock store and an animation-complete listener (only once)
 	if (!player._animLocks) {
@@ -65,6 +67,7 @@ export function BattleRealtimeInputHandler(scene, player, type = 'keyboard') {
       shift: Phaser.Input.Keyboard.KeyCodes.SHIFT
     });
 
+    initPlayerInputState(player);
     return {
       update() {
         if (!player.inputEnabled) return;
@@ -79,19 +82,17 @@ export function BattleRealtimeInputHandler(scene, player, type = 'keyboard') {
           return;
         }
 
-        // Horizontal movement
-        if (cursors.left.isDown || wasdKeys.left.isDown) {
-          sprite.body.setVelocityX(-player.speed * 100);
-          sprite.flipX = false;
-          if (sprite.body.onFloor()) tryPlay('walk');
-        } else if (cursors.right.isDown || wasdKeys.right.isDown) {
-          sprite.body.setVelocityX(player.speed * 100);
-          sprite.flipX = true;
-          if (sprite.body.onFloor()) tryPlay('walk');
-        } else {
-          sprite.body.setVelocityX(0);
-          if (sprite.body.onFloor() && player.health > 0) tryPlay('idle');
-        }
+        // Horizontal movement intent
+        const left = cursors.left.isDown || wasdKeys.left.isDown;
+        const right = cursors.right.isDown || wasdKeys.right.isDown;
+        let axis = 0;
+        if (left && !right) axis = -1;
+        else if (right && !left) axis = 1;
+        setSourceIntent(player, 'keyboard', { left, right, axisX: axis });
+
+        // Play movement animations (use tryPlay to respect locks)
+        if (axis !== 0 && sprite && sprite.body && sprite.body.onFloor()) tryPlay('walk');
+        else if (axis === 0 && sprite && sprite.body && sprite.body.onFloor() && player.health > 0) tryPlay('idle');
 
         // Jump (only trigger when pressed and on floor)
         if ((Phaser.Input.Keyboard.JustDown(cursors.up) || Phaser.Input.Keyboard.JustDown(wasdKeys.up)) && sprite.body.onFloor()) {
@@ -112,6 +113,7 @@ export function BattleRealtimeInputHandler(scene, player, type = 'keyboard') {
     // Keep previous button states to detect edges (press events)
     const prevButtons = {};
 
+    initPlayerInputState(player);
     return {
       update() {
         if (!player.inputEnabled) return;
@@ -130,29 +132,24 @@ export function BattleRealtimeInputHandler(scene, player, type = 'keyboard') {
         // Axis or D-pad horizontal input
         let left = false;
         let right = false;
+        let axisVal = 0;
 
         if (pad.axes && pad.axes.length) {
           const axis0 = pad.axes[0].getValue();
+          axisVal = axis0;
           if (axis0 < -0.1) left = true;
           if (axis0 > 0.1) right = true;
         }
 
         // D-pad overrides axes if pressed
-        if (pad.buttons[14] && pad.buttons[14].pressed) left = true;
-        if (pad.buttons[15] && pad.buttons[15].pressed) right = true;
+        if (pad.buttons[14] && pad.buttons[14].pressed) { left = true; axisVal = -1; }
+        if (pad.buttons[15] && pad.buttons[15].pressed) { right = true; axisVal = 1; }
 
-        if (left) {
-          sprite.body.setVelocityX(-player.speed * 100);
-          sprite.flipX = false;
-          if (sprite.body.onFloor()) tryPlay('walk');
-        } else if (right) {
-          sprite.body.setVelocityX(player.speed * 100);
-          sprite.flipX = true;
-          if (sprite.body.onFloor()) tryPlay('walk');
-        } else {
-          sprite.body.setVelocityX(0);
-          if (sprite.body.onFloor() && player.health > 0) tryPlay('idle');
-        }
+        setSourceIntent(player, 'gamepad', { left, right, axisX: axisVal });
+
+        // Play movement animations
+        if ((left || right) && sprite && sprite.body && sprite.body.onFloor()) tryPlay('walk');
+        else if (!left && !right && sprite && sprite.body && sprite.body.onFloor() && player.health > 0) tryPlay('idle');
 
         // Jump: D-pad up or face button (mapped previously to 12 in old handler)
         const jumpPressed = (pad.buttons[12] && pad.buttons[12].pressed) || (pad.buttons[3] && pad.buttons[3].pressed);
